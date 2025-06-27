@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>你是哪種動物人格？</title>
+  <style>
+    body {
+      font-family: "Noto Sans TC", sans-serif;
+      background: #f0f8ff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      width: 90%;
+      max-width: 600px;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+      position: relative; /* 為了右上角圖片定位 */
+      text-align: center; /* 讓內部元素更容易置中 */
+    }
+    /* === 新增頁面通用樣式 === */
+    .page {
+        display: none; /* 所有頁面預設隱藏 */
+    }
+    .page.active {
+        display: block; /* 顯示當前頁面 */
+    }
+    .page h1 {
+        font-size: 2rem;
+        margin-bottom: 2rem;
+    }
+    .page p {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+    }
+    /* === 右上角小圖 (現在對所有頁面生效) === */
+    #corner-img {
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        width: 40px;
+        height: auto;
+        opacity: 0.8;
+    }
+
+    /* === 測驗頁面樣式 === */
+    .progress {
+      height: 10px;
+      background: #eee;
+      border-radius: 5px;
+      margin-bottom: 1rem;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: #87ceeb;
+      transition: width 0.3s;
+    }
+    .question-img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+    .question {
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .options button, .page button { /* 讓所有按鈕風格統一 */
+      display: block;
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      border: none;
+      border-radius: 8px;
+      background: #add8e6;
+      cursor: pointer;
+      transition: background 0.3s;
+      font-size: 1rem;
+    }
+    .options button:hover, .page button:hover {
+      background: #87ceeb;
+    }
+    /* === 結果頁面樣式 === */
+    .result {
+      text-align: center;
+    }
+    .result img {
+      max-width: 200px;
+      height: auto;
+      margin-top: 1rem;
+    }
+    /* === 結果頁新增文字樣式 === */
+    #final-message {
+        margin-top: 2rem;
+    }
+    #final-message p {
+        font-size: 1rem;
+        margin: 0.5rem 0;
+    }
+    #survey-link {
+        text-decoration: none;
+        color: #1e90ff; /* 連結顏色 */
+    }
+    #survey-link-text {
+        font-size: 1.5rem; /* 放大字體 */
+        font-weight: bold; /* 加粗 */
+        display: inline-block;
+        margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <img id="corner-img" src="https://openclipart.org/download/219619/Red-Panda-2.svg" alt="小動物">
+
+    <div id="consent-page" class="page active">
+        <p>以下為研究版本</p>
+        <button id="consent-btn">我同意上述內容，開始進行遊戲</button>
+    </div>
+
+    <div id="start-page" class="page">
+        <h1>你是哪種動物?</h1>
+        <button id="start-btn">開始遊戲</button>
+    </div>
+
+    <div id="quiz-page" class="page">
+        <div class="progress"><div class="progress-bar" id="progress-bar"></div></div>
+        <img id="q-img" class="question-img" src="" alt="題目圖片"/>
+        <div class="question" id="question">載入中...</div>
+        <div class="options" id="options"></div>
+    </div>
+
+    <div id="result-page" class="page result">
+      <h2 id="result-text"></h2>
+      <img id="result-img" src="" alt="結果圖片"/>
+      <div id="final-message">
+        <p>謝謝您的參與</p>
+        <a href="https://www.surveycake.com/s/G6O4Q" id="survey-link" target="_blank">
+          <span id="survey-link-text">現在請回到表單作答</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const questions = [
+      { q: "你早上起床的第一件事是？", options: ["跳起來開始一天", "賴床再說"] },
+      { q: "遇到挑戰時，你通常？", options: ["主動迎戰", "先觀察形勢"] },
+      { q: "週末時光你喜歡？", options: ["出門跑行程", "宅在家舒服"] },
+      { q: "你與朋友互動時是？", options: ["熱情擁抱派", "默默陪伴型"] },
+      { q: "你更喜歡的工作方式？", options: ["團隊合作", "獨立作業"] },
+      { q: "遇到問題時你會？", options: ["馬上問人", "自己先研究"] },
+      { q: "假如有陌生人接近你？", options: ["馬上打招呼", "保持距離"] },
+      { q: "你的說話風格是？", options: ["直來直往", "含蓄內斂"] },
+      { q: "你出門旅行會？", options: ["玩到沒電", "找地方躺平"] },
+      { q: "你喜歡怎樣的環境？", options: ["熱鬧多變", "安靜穩定"] },
+    ];
+
+    const resultDog = {
+      text: "你是 🐶 狗狗型人格：熱情主動、外向活潑，擅長建立人際關係！",
+      // === 已更換為新的狗狗圖片 ===
+      img: "https://openclipart.org/download/340859/cute-cartoon-dog.svg"
+    };
+    const resultCat = {
+      text: "你是 🐱 貓咪型人格：觀察敏銳、獨立安靜，擅長思考與規劃！",
+      img: "https://openclipart.org/download/247319/Cute-Cartoon-Cat.svg"
+    };
+
+    let currentQuestionIndex = 0;
+    let answers = [];
+
+    // 獲取所有頁面和按鈕的元素
+    const consentPage = document.getElementById('consent-page');
+    const startPage = document.getElementById('start-page');
+    const quizPage = document.getElementById('quiz-page');
+    const resultPage = document.getElementById('result-page');
+
+    const consentBtn = document.getElementById('consent-btn');
+    const startBtn = document.getElementById('start-btn');
+
+    const pb = document.getElementById('progress-bar'),
+          qImg = document.getElementById('q-img'),
+          qTxt = document.getElementById('question'),
+          opts = document.getElementById('options'),
+          resTxt = document.getElementById('result-text'),
+          resImg = document.getElementById('result-img');
+
+    // 流程控制
+    consentBtn.addEventListener('click', () => {
+        consentPage.classList.remove('active');
+        startPage.classList.add('active');
+    });
+
+    startBtn.addEventListener('click', () => {
+        startPage.classList.remove('active');
+        quizPage.classList.add('active');
+        showQuestion(); // 開始第一題
+    });
+
+    function showQuestion() {
+      const progress = (currentQuestionIndex / questions.length) * 100;
+      pb.style.width = `${progress}%`;
+      qImg.src = "https://openclipart.org/image/400px/svg_to_png/250029/cute-dog-cat.png";
+      qTxt.textContent = questions[currentQuestionIndex].q;
+      opts.innerHTML = "";
+      questions[currentQuestionIndex].options.forEach((opt, i) => {
+        const btn = document.createElement("button");
+        btn.textContent = opt;
+        btn.onclick = () => {
+          answers.push(i); // 0 = 偏狗狗，1 = 偏貓咪
+          currentQuestionIndex++;
+          currentQuestionIndex < questions.length ? showQuestion() : showResult();
+        };
+        opts.appendChild(btn);
+      });
+    }
+
+    function showResult() {
+      quizPage.classList.remove('active');
+      resultPage.classList.add('active');
+
+      const sum = answers.reduce((a, b) => a + b, 0);
+      const isCat = sum > questions.length / 2;
+      const result = isCat ? resultCat : resultDog;
+
+      resTxt.textContent = result.text;
+      resImg.src = result.img;
+    }
+
+    // 初始狀態由CSS的 .active class控制，不需JS設定
+  </script>
+</body>
+</html>
