@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>杯中微光，映照真實的你</title>
+  <style>
+    body {
+      font-family: "Noto Sans TC", sans-serif;
+      background: #1a1a1a;
+      color: #f0f0f0;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      width: 90%;
+      max-width: 600px;
+      background: #2b2b2b;
+      padding: 2rem 2rem 4rem 2rem;
+      border-radius: 16px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+      position: relative;
+      text-align: center;
+      overflow: hidden;
+    }
+    .page {
+        display: none;
+    }
+    .page.active {
+        display: block;
+        animation: fadeIn 0.8s;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    #corner-logo {
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        width: 50px; /* 可根據您的Logo調整大小 */
+        height: auto;
+        opacity: 0.9;
+        z-index: 20;
+    }
+    .page h1 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        color: #e4d5b7;
+    }
+    .page .intro-text {
+        font-size: 1.1rem;
+        margin-bottom: 2.5rem;
+        line-height: 1.6;
+        opacity: 0.9;
+    }
+    .question {
+      font-size: 1.25rem;
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    #question-image {
+        width: 100%;
+        height: 200px;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        object-fit: cover;
+        background-color: #444;
+        transition: opacity 0.3s;
+    }
+    .options button, .page button {
+      display: block;
+      width: 100%;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border: 1px solid #555;
+      border-radius: 8px;
+      background: transparent;
+      color: #f0f0f0;
+      cursor: pointer;
+      transition: background 0.3s, border-color 0.3s;
+      font-size: 1rem;
+    }
+    .options button:hover, .page button:hover {
+      background: #e4d5b7;
+      border-color: #e4d5b7;
+      color: #1a1a1a;
+    }
+    #start-btn, #continue-btn, #survey-link button {
+        background: #e4d5b7;
+        color: #1a1a1a;
+        font-weight: bold;
+        border: none;
+    }
+    #transition-page .intro-text {
+        font-size: 1.2rem;
+        margin: 2rem 0;
+    }
+    #transition-page strong {
+        color: #e4d5b7;
+        font-weight: bold;
+    }
+    #result-page .result-title { color: #e4d5b7; font-size: 1.8rem; }
+    #result-page .result-desc { font-size: 1rem; line-height: 1.7; text-align: left; margin: 1.5rem 0; opacity: 0.9; }
+    #result-page .result-wine-pairing { font-size: 0.9rem; line-height: 1.6; text-align: left; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px; border-left: 3px solid #e4d5b7; opacity: 0.8; }
+    #result-page .thank-you { font-size: 1rem; margin-top: 2rem; margin-bottom: 1rem; }
+    #survey-link { text-decoration: none; }
+    .footer-warning {
+        position: absolute; bottom: 0; left: 0; width: 100%; padding: 0.5rem;
+        font-size: 10px; color: #888; background: #2b2b2b; text-align: center; z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <img id="corner-logo" src="Yide_logo.jpg" alt="Logo">
+
+    <div id="start-page" class="page active">
+        <h1>杯中微光，映照真實的你</h1>
+        <p class="intro-text">
+            每種風味，都是一次探索；每個選擇，都勾勒出你的輪廓。<br/>
+            當杯沿輕觸雙唇，一場內心的冒險即將展開。<br/>
+            準備好揭曉專屬於你的靈魂滋味了嗎？
+        </p>
+        <button id="start-btn">【我已年滿十八歲，開始探索】</button>
+    </div>
+
+    <div id="quiz-page" class="page">
+        <div class="question" id="question"></div>
+        <img id="question-image" src="" alt="情境示意圖">
+        <div class="options" id="options"></div>
+    </div>
+
+    <div id="transition-page" class="page">
+        <p class="intro-text">
+            在你選擇的背後，<br/>
+            我們看到了一位<strong>「深思的品鑑家」</strong>的輪廓...
+        </p>
+        <button id="continue-btn">【繼續探索】</button>
+    </div>
+
+    <div id="result-page" class="page">
+        <h2 class="result-title">你是 「深思的品鑑家」</h2>
+        <p class="result-desc">
+            你不追逐轉瞬即逝的喧囂，而是尋找恆久的事物。對你而言，熱鬧是世界的，而寧靜，才是自己的。<br/><br/>
+            你擅長在沉思中構築豐富的內心宇宙，像一位細心的鑑賞家，不僅品味佳釀的層次，也品味生活中的每一處細微光影與言外之意。他人或許看見的是你的沉穩與內斂，卻不知在那片靜默的深海之下，蘊藏著多麼深刻的洞察與溫柔。<br/><br/>
+            
+        </p>
+        <p class="result-wine-pairing">
+            對你而言，一杯 <strong> 單一麥芽威士忌 </strong> 不只是飲品，更是與自己深度對話的媒介。它的沉穩與層次，恰如你內心的豐富世界。
+        </p>
+        <p class="thank-you">謝謝您的參與！</p>
+        <a href="https://www.surveycake.com/s/lGe23" id="survey-link" target="_blank">
+            <button>請進行【問卷】填答</button>
+        </a>
+    </div>
+
+    <div class="footer-warning">
+        禁止酒駕｜飲酒過量，有害健康｜未滿十八歲禁止飲酒
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+        { q: "面對一份突如其來的神秘邀請，你的第一反應是？", options: ["仔細研究邀請函上的紋路與字體，試圖從細節中尋找線索。", "感到興奮，立刻傳訊息給朋友，猜測這會是多麼有趣的派對。"], image: "https://images.pexels.com/photos/21928738/pexels-photo-21928738.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" },
+        { q: "你會如何為這場未知的宴會做準備？", options: ["挑選一套低調而質料上乘的服裝，細節處彰顯品味。", "選擇一件能讓你成為全場焦點的設計，色彩大膽而鮮明。"], image: "https://images.pexels.com/photos/298863/pexels-photo-298863.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" },
+        { q: "出發前的片刻，你會選擇聽什麼樣的音樂來營造氣氛？", options: ["一張舒緩的爵士或古典樂唱片，讓思緒沉澱。", "節奏感強烈的電子或放克音樂，為夜晚注入能量。"], image: "https://images.pexels.com/photos/164821/pexels-photo-164821.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" },
+        { q: "抵達目的地，一扇華麗的大門在你面前。你會...", options: ["先不急著推門，而是欣賞門廊的建築風格與光影設計。", "毫不猶豫地推門而入，渴望一探究竟。"], image: "https://images.pexels.com/photos/315380/pexels-photo-315380.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" },
+        // Q5: 吧台點酒 - 已更新
+        { q: "吧台後方，調酒師正專注地工作。你會如何點第一杯酒？", options: ["走上前，向調酒師描述你偏好的風味，請他推薦。", "觀察多數人喝什麼，或選擇酒單上名字最有趣的一款。"], image: "https://images.pexels.com/photos/31893699/pexels-photo-31893699.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" },
+        { q: "一位陌生人對你舉杯示意，並走來攀談。你會...", options: ["保持禮貌的微笑，與對方聊些關於今晚場合或藝術的深度話題。", "熱情地回應，主動分享自己最近的趣聞，快速拉近距離。"], image: "https://images.pexels.com/photos/4694289/pexels-photo-4694289.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" },
+        { q: "宴會中，一處通往秘密花園的暗門被發現了。你會...", options: ["被花園的靜謐吸引，獨自一人走進去，享受片刻的寧靜。", "立刻號召剛認識的朋友們，一起去這個新發現的秘密基地探險。"], image: "https://images.pexels.com/photos/2752951/pexels-photo-2752951.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" },
+        // Q8: 分享看法 - 已更新
+        { q: "主辦人登場，邀請一位賓客分享對「風味」的看法。你會...", options: ["在心中組織好語言，若被點到，能精準地分享自己的獨到見解。", "享受聆聽，並在台下用生動的表情和掌聲，為分享者營造熱烈氣氛。"], image: "https://images.pexels.com/photos/3856026/pexels-photo-3856026.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" },
+        // Q9: 氣氛高點 - 已更新
+        { q: "夜深了，宴會的氣氛達到最高點。你更可能在哪裡被找到？", options: ["在一個能俯瞰全場的安靜角落，觀察著形形色色的人們，若有所思。", "在舞池或吧台的中心，與身邊的人開懷大笑，享受當下的每一秒。"], image: "https://images.pexels.com/photos/2078008/pexels-photo-2078008.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" },
+        { q: "準備離開時，你會如何為這個夜晚畫下句點？", options: ["低調地向主辦人致意，並再次品味最後一口酒的餘韻。", "與新朋友們交換聯絡方式，相約下次再聚，在一片歡聲笑語中道別。"], image: "https://images.pexels.com/photos/696214/pexels-photo-696214.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" }
+    ];
+
+    let currentQuestionIndex = 0;
+
+    const pages = document.querySelectorAll('.page');
+    const startBtn = document.getElementById('start-btn');
+    const continueBtn = document.getElementById('continue-btn');
+    const qTxt = document.getElementById('question');
+    const qImg = document.getElementById('question-image');
+    const opts = document.getElementById('options');
+
+    function switchPage(targetPageId) {
+        pages.forEach(page => { page.classList.remove('active'); });
+        document.getElementById(targetPageId).classList.add('active');
+    }
+
+    startBtn.addEventListener('click', () => {
+        switchPage('quiz-page');
+        showQuestion();
+    });
+
+    continueBtn.addEventListener('click', () => {
+        switchPage('quiz-page');
+        showQuestion();
+    });
+
+    function showQuestion() {
+      if (currentQuestionIndex >= questions.length) {
+          switchPage('result-page');
+          return;
+      }
+      
+      const currentQ = questions[currentQuestionIndex];
+      qTxt.textContent = currentQ.q;
+      qImg.src = currentQ.image;
+      opts.innerHTML = "";
+      
+      currentQ.options.forEach((opt) => {
+        const btn = document.createElement("button");
+        btn.textContent = opt;
+        btn.onclick = () => {
+          currentQuestionIndex++;
+          
+          if (currentQuestionIndex % 3 === 0 && currentQuestionIndex < questions.length) {
+              switchPage('transition-page');
+          } else {
+              qImg.style.opacity = 0;
+              setTimeout(() => {
+                showQuestion();
+                qImg.style.opacity = 1;
+              }, 300);
+          }
+        };
+        opts.appendChild(btn);
+      });
+    }
+  </script>
+</body>
+</html>
